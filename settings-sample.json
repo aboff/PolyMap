@@ -1,0 +1,16 @@
+{
+	"db": {
+		"host":"localhost",
+		"user":"dbUser",
+		"password":"dbPasword",
+		"database":"dbName",
+		"port":3306
+	},
+	"oauth": {
+		"clientId":"myDiscordAppClientId",
+		"clientSecret":"EuHGM-myDiscordAppClientSecret",
+		"publicKey":"myDiscordAppPublicKey"
+	},
+	"guildId:":"myDiscordServerId",
+	"baseUrl":"https://mywebsite.url/"
+}
