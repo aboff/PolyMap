@@ -11,6 +11,7 @@
 		"clientSecret":"EuHGM-myDiscordAppClientSecret",
 		"publicKey":"myDiscordAppPublicKey"
 	},
-	"guildId:":"myDiscordServerId",
-	"baseUrl":"https://mywebsite.url/"
+	"discordGuild":"myDiscordServerId",
+	"baseUrl":"https://mywebsite.url/",
+	"callbackUrl":"https://mywebsite.url/api/callback"
 }

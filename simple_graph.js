@@ -192,7 +192,16 @@ Drawing.SimpleGraph = function(options) {
       });
      
       
-    });
+    }).fail(function( jqxhr, textStatus, error ) {
+      // console.log(jqxhr);
+      // var err = textStatus + ", " + error;
+      // console.log( "Request Failed: " + err );
+      if(jqxhr.status == 401) {
+        location.href = 'api/login';
+      } else if (jqxhr.status == 403) {
+        alert("Vous n'avez pas accès a ce service.")
+      }
+    });;
     that.layout_options.width = that.layout_options.width || 2000;
     that.layout_options.height = that.layout_options.height || 2000;
     that.layout_options.iterations = that.layout_options.iterations || 100000;
@@ -221,7 +230,7 @@ Drawing.SimpleGraph = function(options) {
       scene.add( node.data.label_object );
     }
 
-    var area = 5000;
+    var area = 3000;
     draw_object.position.x = Math.floor(Math.random() * (area + area + 1) - area);
     draw_object.position.y = Math.floor(Math.random() * (area + area + 1) - area);
 
