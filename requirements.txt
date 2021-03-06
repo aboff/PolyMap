@@ -1,3 +1,4 @@
 Flask==1.0.2
-mysql-connector-python==8.0.23
+mysql-connector-python==8.0.19
 requests_oauthlib==0.5.0
+discord.py==1.6.0

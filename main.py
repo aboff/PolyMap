@@ -24,7 +24,7 @@ if 'http://' not in OAUTH2_REDIRECT_URI:
 
 app.config["APPLICATION_ROOT"] = "/api/"
 OAUTH2_CLIENT_SECRET = app.config["DISCORD_CLIENT_SECRET"] = settings["oauth"]["clientSecret"]
-app.config["DISCORD_BOT_TOKEN"] = ""                    # Required to access BOT resources.
+app.config["DISCORD_BOT_TOKEN"] = settings["discordBotToken"]                    # Required to access BOT resources.
 app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 app.config["SESSION_COOKIE_NAME"]="PolyMap"
 app.config["TESTING"] = True
@@ -58,12 +58,15 @@ def contains(list, filter):
 
 def loadData():
 	try:
+		del data [:]
 		connexion = mysql.connector.connect(
 			host=settings["db"]["host"],
 			user=settings["db"]["user"],
 			password=settings["db"]["password"],
 			database=settings["db"]["database"],
-			port=settings["db"]["port"]
+			port=settings["db"]["port"],
+			auth_plugin='mysql_native_password',
+			autocommit=True
 		)
 
 		request = "select p1.id, p1.label from people p1 "
@@ -73,15 +76,12 @@ def loadData():
 		relations = curseur.fetchall()
 
 		for relation in relations:
-			print("relation : ", relation)
-			subrequest = "select person2 from relationships where person1 = " + str(relation[0])
+			subrequest = "select person2 from relationships where person1 = {0}".format(relation[0])
 			curseur.execute(subrequest)
 			nodesTo = curseur.fetchall()
-			subrequest = "select person1 from relationships where person2 = " + str(relation[0])
+			subrequest = "select person1 from relationships where person2 = {0}".format(relation[0])
 			curseur.execute(subrequest)
 			nodesFrom = curseur.fetchall()
-			print("nodesTo : ", nodesTo)
-			print("nodesFrom : ", nodesFrom)
 			data.append({
 				'ID': relation[0],
 				'data' : {
@@ -90,6 +90,7 @@ def loadData():
 				'nodesTo' : nodesTo,
 				'nodesFrom' : nodesFrom
 			})
+			print("Data: {0}".format(data))
 
 	except Error as e:
 		print("Exception : ", e)
@@ -107,9 +108,6 @@ def api_all():
 		discord = make_session(token=session.get('oauth2_token'))
 		user = discord.get(API_BASE_URL + '/users/@me').json()
 		guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
-		print( "DISCORD_GUILD_ID", DISCORD_GUILD_ID)
-		print("guilds: ", guilds)
-		print(type(guilds))
 
 		if contains(guilds, lambda x: x['id'] == DISCORD_GUILD_ID):
 			loadData()
@@ -148,6 +146,7 @@ def logout():
 		session.clear()
 	finally:
 		return redirect(BASE_URL)
+
 
 if __name__ == "__main__":
     app.run()

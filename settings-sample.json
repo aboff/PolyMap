@@ -12,6 +12,10 @@
 		"publicKey":"myDiscordAppPublicKey"
 	},
 	"discordGuild":"myDiscordServerId",
+	"discordBotToken":"myDiscordBotToken",
+	"discordBotChannel":12345,
+	"discordBotLogChannel":1234567,
+	"deleteBotChannelMessageDelay":28800,
 	"baseUrl":"https://mywebsite.url/",
 	"callbackUrl":"https://mywebsite.url/api/callback"
 }
