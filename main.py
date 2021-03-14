@@ -90,7 +90,7 @@ def loadData():
 				'nodesTo' : nodesTo,
 				'nodesFrom' : nodesFrom
 			})
-			print("Data: {0}".format(data))
+			# print("Data: {0}".format(data))
 
 	except Error as e:
 		print("Exception : ", e)

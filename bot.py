@@ -20,19 +20,29 @@ client = discord.Client(intents=intents)
 async def createRelationship(person1, person2):
 	
 	request = "SELECT id from people WHERE discordTag='{0}#{1}'".format(person1.name, person1.discriminator)
-	person1SQLId = await executeSQLRequestWithSingleResult(request)
+	print("request v0={0}".format(request))
+	try:
+		person1SQLId = await executeSQLRequestWithSingleResult(request)
+	except Exception as e:
+		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(getNick(person1), person1.name, person1.discriminator)
+		person1SQLId = await executeSQLRequestWithoutResult(request)
 	# print("person1SQLId: {0}".format(person1SQLId))
 	if not person1SQLId:
-		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(person1.name, person1.name, person1.discriminator)
+		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(getNick(person1), person1.name, person1.discriminator)
 		person1SQLId = await executeSQLRequestWithoutResult(request)
 		# print("person1SQLId : {0}".format(person1SQLId))
 		# print("trying to insert {0} in DB -> id found: {1}".format(person1, person1SQLId))
 
 	request = "SELECT id from people WHERE discordTag='{0}#{1}'".format(person2.name, person2.discriminator)
-	person2SQLId = await executeSQLRequestWithSingleResult(request)
+	print("request v0 bis={0}".format(request))
+	try:
+		person2SQLId = await executeSQLRequestWithSingleResult(request)
+	except Exception as e:
+		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(getNick(person2), person2.name, person2.discriminator)
+		person2SQLId = await executeSQLRequestWithoutResult(request)
 	# print("person2SQLId: {0}".format(person2SQLId))
 	if not person2SQLId:
-		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(person2.name, person2.name, person2.discriminator)
+		request = "INSERT INTO people(label, discordTag) Values('{0}', '{1}#{2}') ON DUPLICATE KEY UPDATE label='{0}'".format(getNick(person2), person2.name, person2.discriminator)
 		person2SQLId = await executeSQLRequestWithoutResult(request)
 		# print("person2SQLId: {0}".format(person2SQLId))
 	# print("trying to insert {0} in DB -> id found: {1}".format(person2, person2SQLId))
@@ -135,7 +145,7 @@ async def purgeCommandChan():
 	discordBotChannel = client.get_channel(discordBotChannelId)
 	async for msg in discordBotChannel.history(limit=100):
 		await msg.delete()
-	await discordBotChannel.send("Bonjour ! Pour déclarer une relation sur {0} il vous suffit de tagger la personne sur ce chan. La relation sera ajoutée dès qu'elle aura été validée (NON FONCTIONNEL POUR LE MOMENT)".format(siteUrl))
+	await discordBotChannel.send("Bonjour ! Pour déclarer une relation sur {0} il vous suffit de tagger la personne sur ce chan. La relation sera ajoutée dès qu'elle aura été validée".format(siteUrl))
 
 async def testDM(message):
 	history = await message.channel.history(limit=10).flatten()
@@ -210,10 +220,13 @@ async def on_reaction_add(reaction, user):
 						await reaction.message.delete()
 						await reply.delete(delay=10)
 
+def getNick(user):
+	return user.name if not user.nick else user.nick
+
 @client.event
 async def on_member_update(before, after):
-	origin = before.name if not before.nick else before.nick
-	dest = after.name if not after.nick else after.nick
+	origin = getNick(before)
+	dest = getNick(after)
 	if origin != dest:
 		await log("{2}#{3}: {0} s'appelle désormait {1}".format(origin, dest, after.name, after.discriminator))
 
